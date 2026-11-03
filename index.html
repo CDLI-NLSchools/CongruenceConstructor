@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Congruence Constructor: Math 2201 Unit 8</title>
+<style>
+  :root{
+    --ink:#1c2430; --muted:#5a6572; --accent:#0b5cad; --accent-dark:#084a8a;
+    --ok:#177245; --bad:#b3261e; --card:#ffffff; --bg:#eef2f6; --line:#d4dce4;
+    --soft:#f4f8fc; --warn:#8a5a00;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.45;}
+  .wrap{max-width:779px;margin:0 auto;padding:16px 14px 48px;}
+  header{margin:10px 0 14px;}
+  h1{font-size:1.7rem;margin:0 0 2px;}
+  h2{font-size:1.3rem;margin:0 0 6px;}
+  h3{font-size:1.08rem;margin:14px 0 6px;}
+  .subtitle{color:var(--muted);font-size:1rem;margin:0 0 8px;}
+  .instruction{font-size:1.02rem;margin:0;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+    padding:16px;margin:14px 0;box-shadow:0 1px 3px rgba(20,40,60,.06);}
+  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
+  button{font:inherit;cursor:pointer;border:1px solid var(--accent);background:var(--accent);color:#fff;
+    padding:9px 16px;border-radius:8px;min-height:44px;font-weight:600;}
+  button:hover{background:var(--accent-dark);}
+  button.secondary{background:#fff;color:var(--accent);}
+  button.secondary:hover{background:var(--soft);}
+  button[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent);}
+  button.secondary[aria-pressed="true"]{background:var(--accent);color:#fff;}
+  button:disabled{opacity:.55;cursor:default;}
+  button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #f2b01e;outline-offset:2px;}
+  .modebtns{display:flex;flex-wrap:wrap;gap:8px;}
+  .field{display:flex;flex-direction:column;gap:3px;margin:10px 0 0;}
+  .field label{font-size:.88rem;color:var(--muted);font-weight:600;}
+  .field input[type=text],.field input[type=number],.field select{padding:9px 10px;font:inherit;font-size:1.02rem;border:1px solid var(--line);
+    border-radius:8px;min-height:44px;width:100%;background:#fff;}
+  textarea{padding:9px 10px;font:inherit;border:1px solid var(--line);border-radius:8px;width:100%;min-height:84px;background:#fff;}
+  .pickrow{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 0;}
+  .pickopt{border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;gap:8px;align-items:center;background:#fff;font-weight:600;}
+  .pickopt input{width:20px;height:20px;}
+  .checkrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0 0;}
+  .feedback{margin:12px 0 0;border-radius:10px;padding:12px 14px;display:none;}
+  .feedback.show{display:block;}
+  .feedback.ok{background:#f2faf5;border:1px solid var(--ok);}
+  .feedback.bad{background:#fdf3f2;border:1px solid var(--bad);}
+  .feedback.info{background:var(--soft);border:1px solid var(--line);}
+  .feedback p{margin:4px 0;}
+  .feedback .sumline{font-weight:700;}
+  .feedback.ok .sumline{color:var(--ok);}
+  .feedback.bad .sumline{color:var(--bad);}
+  table.plan{border-collapse:collapse;width:100%;font-size:.95rem;margin:10px 0;}
+  table.plan th,table.plan td{border:1px solid var(--line);padding:5px 8px;text-align:left;}
+  table.plan th{background:var(--soft);}
+  .hidden{display:none !important;}
+  .reqbox{border:1px solid var(--line);background:var(--soft);border-radius:10px;padding:12px 14px;margin:12px 0;}
+  .reqbox p{margin:4px 0;}
+  .bigprompt{font-size:1.1rem;font-weight:600;}
+  .note{color:var(--muted);font-size:.94rem;}
+  .diagram{display:flex;justify-content:center;margin:8px 0;}
+  .diagram svg{max-width:100%;height:auto;background:#fff;border:1px solid var(--line);border-radius:10px;}
+  .tilebank{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
+  .tile{border:2px solid var(--accent);background:#fff;color:var(--ink);border-radius:10px;padding:9px 12px;font-weight:600;min-height:44px;}
+  .tile:hover{background:var(--soft);}
+  .tile.used{opacity:.38;border-color:var(--line);}
+  .proofrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0;background:#fff;}
+  .proofrow .stmt{flex:1 1 240px;font-weight:600;}
+  .proofrow select{flex:1 1 200px;}
+  .swing{transform-origin:120px 245px;animation:swingarm 2.6s ease-in-out infinite alternate;}
+  @keyframes swingarm{from{transform:rotate(-7deg);}to{transform:rotate(7deg);}}
+  #decisionSheet{background:#fff;}
+  #decisionSheet table{border-collapse:collapse;width:100%;font-size:.95rem;margin:10px 0;}
+  #decisionSheet th,#decisionSheet td{border:1px solid var(--line);padding:5px 8px;text-align:left;}
+  #decisionSheet th{background:var(--soft);}
+  @media (max-width:680px){ h1{font-size:1.4rem;} }
+  @media print{
+    body{background:#fff;}
+    .wrap{max-width:none;padding:0;}
+    body *{visibility:hidden;}
+    #decisionSheet,#decisionSheet *{visibility:visible;}
+    #decisionSheet{position:absolute;left:0;top:0;width:100%;border:none;box-shadow:none;margin:0;padding:0;}
+    #decisionSheet textarea{border:1px solid #999;}
+    .swing{animation:none;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Congruence Constructor</h1>
+    <p class="subtitle">Math 2201, Unit 8: Properties of Angles and Triangles (Indicators 5.6, 5.4)</p>
+    <p class="instruction">This is practice: test which sets of given parts force one triangle, build congruence statements from the marks, and assemble two-column proofs from pieces. Nothing is recorded and nothing leaves this page. Record your verdict before each reveal: an unrecorded guess is not data.</p>
+  </header>
+
+  <div class="card controls no-print" role="group" aria-label="Choose a mode">
+    <div class="modebtns">
+      <button type="button" id="modeCtor" aria-pressed="true">1. Constructor</button>
+      <button type="button" id="modeStmt" class="secondary" aria-pressed="false">2. Congruence Statements</button>
+      <button type="button" id="modeProof" class="secondary" aria-pressed="false">3. Proof Builder</button>
+      <button type="button" id="modeFlaw" class="secondary" aria-pressed="false">4. Flawed Proofs</button>
+    </div>
+  </div>
+
+  <main>
+    <!-- Mode 1: Constructor -->
+    <section class="card" id="panelCtor" aria-labelledby="cHeading">
+      <h2 id="cHeading">Constructor: which givens force one triangle?</h2>
+      <p>Choose a set of given parts. The diagram shows the givens; the rest of the triangle is up to the geometry. Record your verdict first: does this part-set force exactly one triangle, allow two different ones, allow none, or allow a whole family? Then reveal the construction and compare.</p>
+      <div class="modebtns" role="group" aria-label="Choose a part-set" id="ctorTypes"></div>
+      <div class="reqbox"><p class="bigprompt" id="ctorGivens"></p></div>
+      <div class="diagram" id="ctorDiagram"></div>
+      <fieldset style="border:none;padding:0;margin:0;" id="ctorVerdictBox">
+        <legend style="font-weight:600;">My verdict, recorded before the reveal:</legend>
+        <div class="pickrow" id="ctorPicks" style="flex-direction:column;align-items:stretch;"></div>
+      </fieldset>
+      <div class="checkrow">
+        <button type="button" id="ctorReveal">Record verdict and reveal the construction</button>
+        <button type="button" id="ctorNew" class="secondary">New case of this type</button>
+      </div>
+      <div class="feedback" id="ctorFeedback" aria-live="polite"></div>
+      <div id="ctorSummary" class="hidden">
+        <h3>The pattern, from your own verdicts</h3>
+        <div id="ctorSummaryBody"></div>
+      </div>
+    </section>
+
+    <!-- Mode 2: Congruence statements -->
+    <section class="card hidden" id="panelStmt" aria-labelledby="sHeading">
+      <h2 id="sHeading">Congruence Statements: read the marks</h2>
+      <p>The two triangles are congruent. Tick marks say which sides are equal; arc marks say which angles are equal. For each vertex of triangle ABC, choose the vertex it corresponds to. Get all three and the app writes the congruence statement in correct vertex order.</p>
+      <div class="diagram" id="stmtDiagram"></div>
+      <div id="stmtSelects"></div>
+      <div class="checkrow">
+        <button type="button" id="stmtCheck">Check correspondence</button>
+        <button type="button" id="stmtNew" class="secondary">New pair</button>
+      </div>
+      <div class="feedback" id="stmtFeedback" aria-live="polite"></div>
+    </section>
+
+    <!-- Mode 3: Proof Builder -->
+    <section class="card hidden" id="panelProof" aria-labelledby="pHeading">
+      <h2 id="pHeading">Proof Builder</h2>
+      <p>Assemble the two-column proof: click statement tiles to add rows in order, then give every row its reason. Givens may go in any order; derived steps must come after the steps they rest on; the congruence statement comes before any corresponding-parts claim. The bank includes statements this proof does not need.</p>
+      <div class="reqbox" id="proofGivens"></div>
+      <div class="diagram" id="proofDiagram"></div>
+      <h3>Statement tiles</h3>
+      <div class="tilebank" id="proofTiles"></div>
+      <h3>Your proof</h3>
+      <div id="proofRows"><p class="note">No rows yet. Click a tile to start.</p></div>
+      <div class="checkrow">
+        <button type="button" id="proofCheck">Check my proof</button>
+        <button type="button" id="proofUndo" class="secondary">Remove last row</button>
+        <button type="button" id="proofClear" class="secondary">Clear</button>
+        <button type="button" id="proofNew" class="secondary">New proof</button>
+      </div>
+      <div class="feedback" id="proofFeedback" aria-live="polite"></div>
+    </section>
+
+    <!-- Mode 4: Flawed proofs -->
+    <section class="card hidden" id="panelFlaw" aria-labelledby="fHeading">
+      <h2 id="fHeading">Flawed Proofs</h2>
+      <p>Each proof below looks finished, and exactly one step in it is flawed: a wrong reason, a claim made before it is earned, a false given, or a congruence statement in the wrong vertex order. Name the flawed step, then choose the correction. Checking proofs is indicator 5.4, and it is half of what Section 6 asks of you.</p>
+      <div class="reqbox" id="flawGivens"></div>
+      <div class="diagram" id="flawDiagram"></div>
+      <fieldset style="border:none;padding:0;margin:0;">
+        <legend style="font-weight:600;">Which step is flawed?</legend>
+        <div class="pickrow" id="flawSteps" style="flex-direction:column;align-items:stretch;"></div>
+      </fieldset>
+      <fieldset style="border:none;padding:0;margin:12px 0 0;">
+        <legend style="font-weight:600;">The correction:</legend>
+        <div class="pickrow" id="flawFixes" style="flex-direction:column;align-items:stretch;"></div>
+      </fieldset>
+      <div class="checkrow">
+        <button type="button" id="flawCheck">Check</button>
+        <button type="button" id="flawNew" class="secondary">New flawed proof</button>
+      </div>
+      <div class="feedback" id="flawFeedback" aria-live="polite"></div>
+    </section>
+
+    <!-- Proof Record -->
+    <section class="card" id="decisionSheet" aria-labelledby="dsHeading">
+      <h2 id="dsHeading">Proof Record</h2>
+      <p class="note no-print">This sheet fills in from your work above: constructor verdicts recorded before their reveals, correspondence statements, completed proofs, and repaired flawed proofs. Print it and submit it to the portfolio folder if your teacher asks for it. In Section 6, this record is your drafting surface for the designated portfolio proof: the same moves, on fresh givens.</p>
+      <div id="dsBody">
+        <p>Nothing recorded yet. Record a constructor verdict above and it will appear here.</p>
+      </div>
+      <div class="field">
+        <label for="dsExplain">My notes (which part-set surprised me, and what I check first in a proof)</label>
+        <textarea id="dsExplain" placeholder="Example: SSA surprised me: the opposite side can swing to two positions unless it is long enough. In a proof I now check that corresponding parts only get claimed after the congruence statement."></textarea>
+      </div>
+      <div class="checkrow no-print">
+        <button type="button" id="printBtn">Print proof record</button>
+      </div>
+    </section>
+  </main>
+</div>
+<script>
+"use strict";
+// ==GENERATOR==
+// Congruence Constructor generator. Pure functions, no DOM. Constructor
+// items carry explicit coordinates built from the given parts, so the drawn
+// triangle is the constructed triangle. SSA items are generated inside a
+// named regime (none, right, two, or one-by-length) and the outcome is then
+// read back off the numbers by classifySSA, the same function the harness
+// re-derives from the discriminant. Proof families are chosen to keep clear
+// of the Section 6 portfolio proofs and the test's CR2 and CR3: no crossing
+// segments anywhere in the proof generator (both portfolio proofs live on
+// crossing segments), and no angle bisector anywhere (the test's CR2 owns
+// the bisector configuration).
+function makeRng(seed) {
+  if (seed === undefined) seed = (Math.random() * 2147483647) | 0;
+  let state = seed >>> 0;
+  return function () {
+    state = (state + 0x6D2B79F5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function rInt(r, lo, hi) { return lo + Math.floor(r() * (hi - lo + 1)); }
+function rPick(r, arr) { return arr[Math.floor(r() * arr.length)]; }
+function rHalf(r, lo, hi) { return Math.round((lo + r() * (hi - lo)) * 2) / 2; }
+function rad(deg) { return deg * Math.PI / 180; }
+function round1(x) { return Math.round(x * 10) / 10; }
+function clean(x) { return Number.isInteger(x) ? String(x) : String(round1(x)); }
+function distP(p, q) { return Math.hypot(p[0] - q[0], p[1] - q[1]); }
+function angleAtPts(v, p, q) {
+  const u = [p[0] - v[0], p[1] - v[1]], w = [q[0] - v[0], q[1] - v[1]];
+  const lu = Math.hypot(u[0], u[1]) || 1, lw = Math.hypot(w[0], w[1]) || 1;
+  let dot = (u[0] * w[0] + u[1] * w[1]) / (lu * lw);
+  dot = Math.max(-1, Math.min(1, dot));
+  return Math.acos(dot) * 180 / Math.PI;
+}
+function triGeom(pts) {
+  return {
+    sides: { AB: round1(distP(pts.A, pts.B) / 13), BC: round1(distP(pts.B, pts.C) / 13), CA: round1(distP(pts.C, pts.A) / 13) },
+    angles: { A: round1(angleAtPts(pts.A, pts.B, pts.C)), B: round1(angleAtPts(pts.B, pts.A, pts.C)), C: round1(angleAtPts(pts.C, pts.A, pts.B)) }
+  };
+}
+var VERDICTS = ["Exactly one triangle", "Two different triangles", "No triangle is possible",
+                "A whole family of triangles (same shape, different sizes)"];
+var CTOR_TYPES = ["SSS", "SAS", "SSA", "ASA", "AAS", "AAA"];
+var PXU = 13; // pixels per unit in constructor diagrams
+
+function classifySSA(angleA, b, a) {
+  const h = b * Math.sin(rad(angleA));
+  if (a < h - 0.06) return "none";
+  if (Math.abs(a - h) <= 0.06) return "one";
+  if (a < b - 0.02) return "two";
+  return "one";
+}
+
+function ctorItem(type, givenText, givenSides, givenAngles, outcome, explanation, pts, extra) {
+  const g = pts ? triGeom(pts) : { sides: {}, angles: {} };
+  const item = { type: type, givenText: givenText, givenSides: givenSides, givenAngles: givenAngles,
+                 outcome: outcome, verdictKey: VERDICTS[outcome === "one" ? 0 : outcome === "two" ? 1 : outcome === "none" ? 2 : 3],
+                 explanation: explanation, pts: pts, altPts: null, swing: null, noneInfo: null,
+                 sideVals: g.sides, angleVals: g.angles };
+  if (extra) Object.assign(item, extra);
+  return item;
+}
+
+function genSSS(r) {
+  const b = rInt(r, 7, 11), c = rInt(r, 7, 11);
+  const lo = Math.abs(b - c) + 1.5, hi = b + c - 1.5;
+  const a = Math.round((lo + r() * (hi - lo)) * 2) / 2;
+  const A = [64, 246], B = [64 + c * PXU, 246];
+  const cosA = (b * b + c * c - a * a) / (2 * b * c);
+  const C = [64 + b * cosA * PXU, 246 - b * Math.sqrt(Math.max(0.05, 1 - cosA * cosA)) * PXU];
+  return ctorItem("SSS",
+    "Three sides: AB = " + c + ", AC = " + b + ", BC = " + clean(a) + " units.",
+    ["AB", "BC", "CA"], [], "one",
+    "Three side lengths fix every angle: the third vertex is the one point (on a chosen side of AB) where the two circles of radius AC and BC meet. SSS is a congruence shortcut.",
+    { A: A, B: B, C: C });
+}
+function genSAS(r) {
+  const angA = rInt(r, 7, 22) * 5, b = rHalf(r, 6.5, 11), c = rHalf(r, 6.5, 11);
+  const A = [64, 246], B = [64 + c * PXU, 246];
+  const C = [64 + b * Math.cos(rad(angA)) * PXU, 246 - b * Math.sin(rad(angA)) * PXU];
+  return ctorItem("SAS",
+    "Two sides and the angle between them: angle A = " + angA + " degrees, AB = " + clean(c) + ", AC = " + clean(b) + " units.",
+    ["AB", "CA"], ["A"], "one",
+    "The included angle pins the two sides into one rigid corner: swing either side and the angle changes, which is not allowed. The third side is forced. SAS is a congruence shortcut.",
+    { A: A, B: B, C: C });
+}
+function asaPoints(angA, angB, c) {
+  const angC = 180 - angA - angB;
+  const bLen = c * Math.sin(rad(angB)) / Math.sin(rad(angC));
+  const A = [64, 246], B = [64 + c * PXU, 246];
+  const C = [64 + bLen * Math.cos(rad(angA)) * PXU, 246 - bLen * Math.sin(rad(angA)) * PXU];
+  return { A: A, B: B, C: C };
+}
+function genASA(r) {
+  let angA = rInt(r, 30, 80), angB = rInt(r, 30, 80), guard = 0;
+  while (angA + angB > 135 && guard++ < 50) { angB = rInt(r, 30, 70); }
+  const c = rInt(r, 8, 12);
+  return ctorItem("ASA",
+    "Two angles and the side between them: angle A = " + angA + " degrees, angle B = " + angB + " degrees, AB = " + c + " units.",
+    ["AB"], ["A", "B"], "one",
+    "The side fixes the scale and the two angles fix both directions from its ends; the rays meet at exactly one point. ASA is a congruence shortcut.",
+    asaPoints(angA, angB, c));
+}
+function genAAS(r) {
+  let angA = rInt(r, 30, 80), angB = rInt(r, 30, 80), guard = 0;
+  while (angA + angB > 135 && guard++ < 50) { angB = rInt(r, 30, 70); }
+  const angC = 180 - angA - angB;
+  const a = rInt(r, 7, 11);
+  const c = round1(a * Math.sin(rad(angC)) / Math.sin(rad(angA)));
+  return ctorItem("AAS",
+    "Two angles and a side that is not between them: angle A = " + angA + " degrees, angle B = " + angB + " degrees, BC = " + a + " units (across from angle A).",
+    ["BC"], ["A", "B"], "one",
+    "The third angle is forced by the angle sum (" + angC + " degrees), which turns this into the included-side case in disguise. AAS is a congruence shortcut.",
+    asaPoints(angA, angB, c));
+}
+function genAAA(r) {
+  let angA = rInt(r, 35, 75), angB = rInt(r, 35, 75), guard = 0;
+  while (angA + angB > 130 && guard++ < 50) { angB = rInt(r, 35, 65); }
+  const angC = 180 - angA - angB;
+  const pts = asaPoints(angA, angB, 10);
+  const alt = { A: pts.A.slice(),
+                B: [pts.A[0] + (pts.B[0] - pts.A[0]) * 0.68, pts.A[1] + (pts.B[1] - pts.A[1]) * 0.68],
+                C: [pts.A[0] + (pts.C[0] - pts.A[0]) * 0.68, pts.A[1] + (pts.C[1] - pts.A[1]) * 0.68] };
+  return ctorItem("AAA",
+    "Three angles and no side at all: angle A = " + angA + " degrees, angle B = " + angB + " degrees, angle C = " + angC + " degrees.",
+    [], ["A", "B", "C"], "family",
+    "Angles fix the shape and nothing else: with no side given, the same three angles fit a triangle of any size. AAA gives similarity, never congruence, and is not a shortcut.",
+    pts, { altPts: alt });
+}
+function genSSA(r) {
+  const angA = rInt(r, 28, 55), b = rInt(r, 7, 11);
+  const h = b * Math.sin(rad(angA));
+  const regime = rPick(r, ["two", "two", "two", "one-long", "one-long", "right", "none", "none"]);
+  let a;
+  if (regime === "none") a = round1(h * rPick(r, [0.7, 0.8, 0.86]));
+  else if (regime === "right") a = round1(h);
+  else if (regime === "two") a = round1(h + 0.5 + r() * (b - 0.4 - (h + 0.5)));
+  else a = round1(b + rPick(r, [0.5, 1.5, 2.5]));
+  const outcome = classifySSA(angA, b, a);
+  const A = [64, 246], C = [64 + b * PXU, 246];
+  const dirv = [Math.cos(rad(angA)), -Math.sin(rad(angA))];
+  const along = b * Math.cos(rad(angA));
+  const disc = Math.sqrt(Math.max(0, a * a - h * h));
+  function onRay(dUnits) { return [A[0] + dUnits * PXU * dirv[0], A[1] + dUnits * PXU * dirv[1]]; }
+  let pts = null, altPts = null, noneInfo = null, explain = "";
+  if (outcome === "two") {
+    pts = { A: A, B: onRay(along - disc), C: C };
+    altPts = { A: A, B: onRay(along + disc), C: C };
+    explain = "The side across from the angle swings on a hinge at C. Its length, " + clean(a) + " units, is longer than the shortest distance from C to the slanted side (" + clean(round1(h)) + " units) but shorter than AC (" + b + " units), so it lands on the slanted side in two places: two different triangles. SSA is not a shortcut.";
+  } else if (outcome === "one" && regime === "right") {
+    pts = { A: A, B: onRay(along), C: C };
+    explain = "The swinging side is exactly the shortest distance from C to the slanted side (" + clean(round1(h)) + " units): it touches at exactly one point, making a right angle there. One triangle, but only because the length happened to be exactly right.";
+  } else if (outcome === "one") {
+    pts = { A: A, B: onRay(along + disc), C: C };
+    explain = "The swinging side (" + clean(a) + " units) is at least as long as AC (" + b + " units), so although the circle meets the slanted line twice, one meeting point falls behind A and cannot form this triangle. One triangle. SSA still is not a shortcut: a slightly shorter side would have given two.";
+  } else {
+    noneInfo = { A: A, C: C, H: onRay(along), rayEnd: onRay(along + 4.5), radius: a * PXU, hVal: round1(h), aVal: a };
+    explain = "The swinging side is too short to reach: the closest the slanted side ever gets to C is " + clean(round1(h)) + " units (the perpendicular distance), and the side is only " + clean(a) + " units. No triangle is possible.";
+  }
+  const item = ctorItem("SSA",
+    "Angle A = " + angA + " degrees; the side next to it, AC = " + b + " units; the side across from it, CB = " + clean(a) + " units. The given angle is not between the two given sides.",
+    ["CA", "BC"], ["A"], outcome, explain, pts,
+    { altPts: altPts, noneInfo: noneInfo, regime: regime, ssa: { angleA: angA, b: b, a: a, h: round1(h) } });
+  item.swing = { C: C, armAngle: Math.atan2((pts ? pts.B[1] : noneInfo.H[1]) - C[1], (pts ? pts.B[0] : noneInfo.H[0]) - C[0]) * 180 / Math.PI, len: a * PXU };
+  return item;
+}
+function genConstructor(type, rng) {
+  const r = rng || makeRng();
+  const t = type || rPick(r, CTOR_TYPES);
+  if (t === "SSS") return genSSS(r);
+  if (t === "SAS") return genSAS(r);
+  if (t === "ASA") return genASA(r);
+  if (t === "AAS") return genAAS(r);
+  if (t === "AAA") return genAAA(r);
+  return genSSA(r);
+}
+
+// ---------- Congruence statements ----------
+
+function ranksOf(values) {
+  // values: {key: number}; returns {key: rank} with 1 = smallest. Requires distinct values.
+  const sorted = Object.keys(values).slice().sort((x, y) => values[x] - values[y]);
+  const out = {};
+  sorted.forEach((k, i) => { out[k] = i + 1; });
+  return out;
+}
+function genStatement(rng) {
+  const r = rng || makeRng();
+  let pts1 = null, geom = null, ok = false, guard = 0;
+  while (!ok && guard++ < 60) {
+    pts1 = { A: [66 + r() * 26 - 13, 252 + r() * 16 - 8], B: [292 + r() * 26 - 13, 238 + r() * 16 - 8], C: [150 + r() * 30 - 15, 76 + r() * 18 - 9] };
+    geom = triGeom(pts1);
+    const sv = [geom.sides.AB, geom.sides.BC, geom.sides.CA];
+    const av = [geom.angles.A, geom.angles.B, geom.angles.C];
+    ok = Math.abs(sv[0] - sv[1]) >= 0.9 && Math.abs(sv[1] - sv[2]) >= 0.9 && Math.abs(sv[0] - sv[2]) >= 0.9 &&
+         Math.abs(av[0] - av[1]) >= 4 && Math.abs(av[1] - av[2]) >= 4 && Math.abs(av[0] - av[2]) >= 4;
+  }
+  const refl = r() < 0.5;
+  const rot = rPick(r, [25, 80, 140, 205, 260, 320]) + r() * 14 - 7;
+  const names = ["P", "Q", "R"];
+  for (let i = names.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); const t = names[i]; names[i] = names[j]; names[j] = t; }
+  const imgOf = { A: names[0], B: names[1], C: names[2] };
+  // Transform: optional reflection, rotation, then centre in the canvas.
+  function xf(p) {
+    let x = refl ? -p[0] : p[0], y = p[1];
+    const th = rad(rot);
+    return [x * Math.cos(th) - y * Math.sin(th), x * Math.sin(th) + y * Math.cos(th)];
+  }
+  const raw = {}; let minX = 1e9, maxX = -1e9, minY = 1e9, maxY = -1e9;
+  ["A", "B", "C"].forEach((v) => {
+    raw[v] = xf(pts1[v]);
+    minX = Math.min(minX, raw[v][0]); maxX = Math.max(maxX, raw[v][0]);
+    minY = Math.min(minY, raw[v][1]); maxY = Math.max(maxY, raw[v][1]);
+  });
+  const dx = 492 - (minX + maxX) / 2, dy = 152 - (minY + maxY) / 2;
+  const pts2 = {}, pts1s = pts1;
+  ["A", "B", "C"].forEach((v) => { pts2[imgOf[v]] = [raw[v][0] + dx, raw[v][1] + dy]; });
+  const sideTicks = ranksOf(geom.sides), angleArcs = ranksOf(geom.angles);
+  const sideTicks2 = {}, angleArcs2 = {};
+  [["A", "B"], ["B", "C"], ["C", "A"]].forEach((pr) => {
+    sideTicks2[[imgOf[pr[0]], imgOf[pr[1]]].sort().join("")] = sideTicks[pr.join("")];
+  });
+  ["A", "B", "C"].forEach((v) => { angleArcs2[imgOf[v]] = angleArcs[v]; });
+  return { pts1: pts1s, pts2: pts2, imgOf: imgOf, sideVals: geom.sides, angleVals: geom.angles,
+           sideTicks: sideTicks, angleArcs: angleArcs, sideTicks2: sideTicks2, angleArcs2: angleArcs2 };
+}
+
+// ---------- Proofs ----------
+
+var REASON_BANK = ["Given", "Definition of midpoint", "Common side (reflexive)", "Vertically opposite angles",
+                   "Alternate interior angles (parallel lines)", "SSS", "SAS", "ASA", "AAS",
+                   "Corresponding parts of congruent triangles"];
+function S(id, text, reason, group) { return { id: id, text: text, reason: reason, group: group }; }
+function pairKey(a, b) { return [a, b].sort().join(""); }
+
+function buildP1(r) {
+  const q = rInt(r, 30, 90), h = rInt(r, 72, 98);
+  const B = [70, 192], C = [310, 192];
+  const points = { B: B, C: C, A: [70 + q, 192 - h], D: [70 + q, 192 + h] };
+  return { family: "P1", title: "Two triangles on a shared base", configTag: "shared-base SSS",
+    points: points, segments: [["A", "B"], ["A", "C"], ["B", "C"], ["D", "B"], ["D", "C"]],
+    sideTicks: { AB: 1, BD: 1, AC: 2, CD: 2 }, parallels: [], midpoint: null,
+    givenLines: ["AB = DB", "AC = DC", "Triangles ABC and DBC stand on the shared base BC."],
+    goalText: "Prove: angle A = angle D.", falseGivenText: "AD = BC",
+    statements: [S("g1", "AB = DB", "Given", 0), S("g2", "AC = DC", "Given", 0),
+                 S("d1", "BC = BC", "Common side (reflexive)", 1),
+                 S("c1", "Triangle ABC is congruent to triangle DBC", "SSS", 2),
+                 S("c2", "Angle A = angle D", "Corresponding parts of congruent triangles", 3)],
+    distractors: [S("x1", "AD = BC", "Given", 0), S("x2", "Triangle ABC is congruent to triangle DCB", "SSS", 2)] };
+}
+function paraPoints(r) {
+  const ox = rInt(r, 18, 44);
+  return { A: [78, 108], B: [268, 108], C: [268 + ox, 214], D: [78 + ox, 214] };
+}
+function buildP2(r) {
+  return { family: "P2", title: "A parallelogram cut by a diagonal (SAS)", configTag: "parallelogram diagonal SAS",
+    points: paraPoints(r), segments: [["A", "B"], ["B", "C"], ["C", "D"], ["D", "A"], ["A", "C"]],
+    sideTicks: { AB: 1, CD: 1 }, parallels: [{ pair: "AB", count: 1 }, { pair: "CD", count: 1 }], midpoint: null,
+    givenLines: ["AB = CD", "AB is parallel to CD", "AC is a diagonal of quadrilateral ABCD."],
+    goalText: "Prove: BC = DA.", falseGivenText: "AB = BC",
+    statements: [S("g1", "AB = CD", "Given", 0), S("g2", "AB is parallel to CD", "Given", 0),
+                 S("d1", "Angle BAC = angle DCA", "Alternate interior angles (parallel lines)", 1),
+                 S("d2", "AC = AC", "Common side (reflexive)", 1),
+                 S("c1", "Triangle ABC is congruent to triangle CDA", "SAS", 2),
+                 S("c2", "BC = DA", "Corresponding parts of congruent triangles", 3)],
+    distractors: [S("x1", "BD = BD", "Common side (reflexive)", 1), S("x2", "Triangle ABC is congruent to triangle ACD", "SAS", 2)] };
+}
+function buildP3(r) {
+  const h = rInt(r, 118, 148);
+  const points = { B: [70, 232], C: [310, 232], A: [190, 232 - h], D: [190, 232] };
+  return { family: "P3", title: "A line to the base of an isosceles triangle", configTag: "isosceles base median SSS",
+    points: points, segments: [["A", "B"], ["B", "C"], ["A", "C"], ["A", "D"]],
+    sideTicks: { AB: 1, AC: 1, BD: 2, CD: 2 }, parallels: [], midpoint: null,
+    givenLines: ["AB = AC", "BD = CD, with D on BC", "AD is drawn to the base."],
+    goalText: "Prove: angle BAD = angle CAD.", falseGivenText: "AB = AD",
+    statements: [S("g1", "AB = AC", "Given", 0), S("g2", "BD = CD", "Given", 0),
+                 S("d1", "AD = AD", "Common side (reflexive)", 1),
+                 S("c1", "Triangle ABD is congruent to triangle ACD", "SSS", 2),
+                 S("c2", "Angle BAD = angle CAD", "Corresponding parts of congruent triangles", 3)],
+    distractors: [S("x1", "AB = AD", "Given", 0), S("x2", "Triangle ABD is congruent to triangle ADC", "SSS", 2)] };
+}
+function buildP4(r) {
+  return { family: "P4", title: "A parallelogram cut by a diagonal (ASA)", configTag: "parallelogram diagonal ASA",
+    points: paraPoints(r), segments: [["A", "B"], ["B", "C"], ["C", "D"], ["D", "A"], ["A", "C"]],
+    sideTicks: {}, parallels: [{ pair: "AB", count: 1 }, { pair: "CD", count: 1 }, { pair: "AD", count: 2 }, { pair: "BC", count: 2 }], midpoint: null,
+    givenLines: ["AB is parallel to CD", "AD is parallel to BC", "AC is a diagonal of quadrilateral ABCD."],
+    goalText: "Prove: AB = CD.", falseGivenText: "BD = AC",
+    statements: [S("g1", "AB is parallel to CD", "Given", 0), S("g2", "AD is parallel to BC", "Given", 0),
+                 S("d1", "Angle BAC = angle DCA", "Alternate interior angles (parallel lines)", 1),
+                 S("d2", "Angle DAC = angle BCA", "Alternate interior angles (parallel lines)", 1),
+                 S("d3", "AC = AC", "Common side (reflexive)", 1),
+                 S("c1", "Triangle ABC is congruent to triangle CDA", "ASA", 2),
+                 S("c2", "AB = CD", "Corresponding parts of congruent triangles", 3)],
+    distractors: [S("x1", "BD = AC", "Given", 0), S("x2", "Triangle ABC is congruent to triangle ACD", "ASA", 2)] };
+}
+var PROOF_BUILDERS = { P1: buildP1, P2: buildP2, P3: buildP3, P4: buildP4 };
+var PROOF_FAMILIES = ["P1", "P2", "P3", "P4"];
+function genProof(rng) {
+  const r = rng || makeRng();
+  const fam = rPick(r, PROOF_FAMILIES);
+  const proof = PROOF_BUILDERS[fam](r);
+  proof.reasonBank = REASON_BANK.slice();
+  return proof;
+}
+
+// Assembly checker: order groups must be non-decreasing (givens any order
+// within group 0, derived steps within group 1), every required statement
+// present with its exact reason, no distractor included.
+function checkProofAssembly(proof, chosenIds, reasonsById) {
+  const problems = [];
+  const byId = {};
+  proof.statements.concat(proof.distractors).forEach((s) => { byId[s.id] = s; });
+  const chosen = chosenIds.map((id) => byId[id]).filter(Boolean);
+  chosen.forEach((s) => {
+    if (proof.distractors.indexOf(s) >= 0) problems.push("\"" + s.text + "\" is not one of the steps this proof needs.");
+  });
+  proof.statements.forEach((s) => {
+    if (chosenIds.indexOf(s.id) < 0) problems.push("A needed step is missing: \"" + s.text + "\".");
+  });
+  for (let i = 1; i < chosen.length; i++) {
+    if (chosen[i].group < chosen[i - 1].group) {
+      problems.push("\"" + chosen[i].text + "\" appears too early: it rests on steps that must come before it.");
+      break;
+    }
+  }
+  chosen.forEach((s) => {
+    if (proof.statements.indexOf(s) >= 0 && reasonsById[s.id] !== s.reason) {
+      problems.push("\"" + s.text + "\" needs the reason \"" + s.reason + "\", not \"" + (reasonsById[s.id] || "no reason chosen") + "\".");
+    }
+  });
+  return { ok: problems.length === 0, problems: problems };
+}
+
+// ---------- Flawed proofs ----------
+
+function wrongReasonFor(reason) {
+  if (reason === "SSS") return "SAS";
+  if (reason === "SAS") return "ASA";
+  if (reason === "ASA") return "SSS";
+  if (reason === "Alternate interior angles (parallel lines)") return "Vertically opposite angles";
+  if (reason === "Common side (reflexive)") return "Definition of midpoint";
+  if (reason === "Definition of midpoint") return "Common side (reflexive)";
+  if (reason === "Corresponding parts of congruent triangles") return "Given";
+  return "Given";
+}
+function genFlawed(rng) {
+  const r = rng || makeRng();
+  const proof = genProof(r);
+  const rows = proof.statements.slice().sort((a, b) => a.group - b.group);
+  const displayed = rows.map((s) => ({ statement: s.text, reason: s.reason }));
+  const flawKind = rPick(r, ["reason", "early", "order", "falseGiven"]);
+  let flawIndex = -1, correctFix = "";
+  const c1Idx = rows.findIndex((s) => s.group === 2);
+  const c2Idx = rows.findIndex((s) => s.group === 3);
+  if (flawKind === "reason") {
+    const candidates = rows.map((s, i) => i).filter((i) => rows[i].group === 1 || rows[i].group === 2);
+    flawIndex = rPick(r, candidates);
+    const wrong = wrongReasonFor(rows[flawIndex].reason);
+    displayed[flawIndex].reason = wrong;
+    correctFix = "Step " + (flawIndex + 1) + " is justified by \"" + rows[flawIndex].reason + "\", not \"" + wrong + "\".";
+  } else if (flawKind === "early") {
+    const tmp = displayed[c1Idx]; displayed[c1Idx] = displayed[c2Idx]; displayed[c2Idx] = tmp;
+    flawIndex = c1Idx;
+    correctFix = "The corresponding-parts claim sits before the congruence statement it depends on; the congruence (Step " + (c2Idx + 1) + " as printed) must come first.";
+  } else if (flawKind === "order") {
+    const wrong = proof.distractors.filter((d) => d.text.indexOf("Triangle") === 0)[0];
+    displayed[c1Idx].statement = wrong.text;
+    flawIndex = c1Idx;
+    correctFix = "The congruence statement names the triangles in the wrong vertex order; it should read \"" + rows[c1Idx].text + "\".";
+  } else {
+    flawIndex = 0;
+    displayed[0].statement = proof.falseGivenText;
+    correctFix = "Step 1 states \"" + proof.falseGivenText + "\", which is neither given nor true in this figure; the given is \"" + rows[0].text + "\".";
+  }
+  const altFix = flawKind === "reason" ? "Step " + (flawIndex + 1) + " is fine; the flaw is that a given was never used."
+    : flawKind === "early" ? "The final step should be moved to the front of the proof."
+    : flawKind === "order" ? "The vertex order is fine; the flaw is a missing common-side step."
+    : "Step 1 is fine; the flaw is in the last step's reason.";
+  const fixOptions = [
+    { id: "fix", text: correctFix },
+    { id: "none", text: "There is no flaw; the proof is correct as written." },
+    { id: "alt", text: altFix }
+  ];
+  // Shuffle deterministically under the rng so position carries no signal.
+  for (let i = fixOptions.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); const t = fixOptions[i]; fixOptions[i] = fixOptions[j]; fixOptions[j] = t; }
+  return { proof: proof, flawIndex: flawIndex, flawKind: flawKind, displayed: displayed,
+           fixOptions: fixOptions, correctFixId: "fix",
+           canonical: rows.map((s) => ({ statement: s.text, reason: s.reason })) };
+}
+
+// ---------- SVG builders ----------
+
+function fmt(n) { return Math.round(n * 10) / 10; }
+function polarFrom(p, deg, dist) { const a = rad(deg); return [p[0] + Math.cos(a) * dist, p[1] + Math.sin(a) * dist]; }
+function arcPath(vertex, r1, r2, radius) {
+  const a1 = Math.atan2(r1[1] - vertex[1], r1[0] - vertex[0]) * 180 / Math.PI;
+  const a2 = Math.atan2(r2[1] - vertex[1], r2[0] - vertex[0]) * 180 / Math.PI;
+  let sweep = ((a2 - a1) % 360 + 360) % 360;
+  if (sweep > 180) sweep -= 360;
+  const p1 = polarFrom(vertex, a1, radius);
+  const p2 = polarFrom(vertex, a1 + sweep, radius);
+  return "M " + fmt(p1[0]) + " " + fmt(p1[1]) + " A " + radius + " " + radius + " 0 " + (Math.abs(sweep) > 180 ? 1 : 0) + " " + (sweep >= 0 ? 1 : 0) + " " + fmt(p2[0]) + " " + fmt(p2[1]);
+}
+function midDir(vertex, r1, r2) {
+  const a1 = Math.atan2(r1[1] - vertex[1], r1[0] - vertex[0]) * 180 / Math.PI;
+  const a2 = Math.atan2(r2[1] - vertex[1], r2[0] - vertex[0]) * 180 / Math.PI;
+  let sweep = ((a2 - a1) % 360 + 360) % 360;
+  if (sweep > 180) sweep -= 360;
+  return a1 + sweep / 2;
+}
+function sideLabelPos(p, q, out) {
+  const mx = (p[0] + q[0]) / 2, my = (p[1] + q[1]) / 2;
+  let dx = mx - out[0], dy = my - out[1];
+  const len = Math.hypot(dx, dy) || 1;
+  return [mx + dx / len * 17, my + dy / len * 17 + 4];
+}
+function triSVG(pts, opts) {
+  opts = opts || {};
+  const centroid = [(pts.A[0] + pts.B[0] + pts.C[0]) / 3, (pts.A[1] + pts.B[1] + pts.C[1]) / 3];
+  let out = "";
+  [["A", "B"], ["B", "C"], ["C", "A"]].forEach((pr) => {
+    out += '<line x1="' + fmt(pts[pr[0]][0]) + '" y1="' + fmt(pts[pr[0]][1]) + '" x2="' + fmt(pts[pr[1]][0]) + '" y2="' + fmt(pts[pr[1]][1]) + '" stroke="' + (opts.dashed ? "#8a94a0" : "#1c2430") + '" stroke-width="2"' + (opts.dashed ? ' stroke-dasharray="6 4"' : "") + "/>";
+  });
+  if (opts.sideLabels) {
+    [["A", "B"], ["B", "C"], ["C", "A"]].forEach((pr) => {
+      const key = pr.join("");
+      if (!opts.sideLabels[key]) return;
+      const lp = sideLabelPos(pts[pr[0]], pts[pr[1]], centroid);
+      out += '<text x="' + fmt(lp[0]) + '" y="' + fmt(lp[1]) + '" font-size="13.5" font-weight="700" fill="' + opts.sideLabels[key].color + '" text-anchor="middle">' + opts.sideLabels[key].text + "</text>";
+    });
+  }
+  if (opts.angleLabels) {
+    [["A", "B", "C"], ["B", "A", "C"], ["C", "A", "B"]].forEach((tr) => {
+      const v = tr[0];
+      if (!opts.angleLabels[v]) return;
+      out += '<path d="' + arcPath(pts[v], pts[tr[1]], pts[tr[2]], 24) + '" fill="none" stroke="' + opts.angleLabels[v].color + '" stroke-width="2.2"/>';
+      const lp = polarFrom(pts[v], midDir(pts[v], pts[tr[1]], pts[tr[2]]), 41);
+      out += '<text x="' + fmt(lp[0]) + '" y="' + fmt(lp[1] + 4) + '" font-size="13.5" font-weight="700" fill="' + opts.angleLabels[v].color + '" text-anchor="middle">' + opts.angleLabels[v].text + "</text>";
+    });
+  }
+  ["A", "B", "C"].forEach((v) => {
+    let dx = pts[v][0] - centroid[0], dy = pts[v][1] - centroid[1];
+    const len = Math.hypot(dx, dy) || 1;
+    dx = dx / len * 15; dy = dy / len * 15;
+    out += '<circle cx="' + fmt(pts[v][0]) + '" cy="' + fmt(pts[v][1]) + '" r="2.6" fill="#1c2430"/>';
+    out += '<text x="' + fmt(pts[v][0] + dx) + '" y="' + fmt(pts[v][1] + dy + 5) + '" font-size="14" font-weight="600" fill="#1c2430" text-anchor="middle">' + v + "</text>";
+  });
+  return out;
+}
+function buildConstructorSVG(item, phase) {
+  let out = '<svg viewBox="0 0 380 300" width="380" height="300" role="img" aria-label="Construction diagram">';
+  const givenCol = "#0b5cad", plainCol = "#5a6572";
+  function labelsFor(pts, withAll) {
+    const sl = {}, al = {};
+    ["AB", "BC", "CA"].forEach((k) => {
+      const given = item.givenSides.indexOf(k) >= 0;
+      if (given || withAll) sl[k] = { text: clean(item.sideVals[k] || triGeom(pts).sides[k]), color: given ? givenCol : plainCol };
+    });
+    ["A", "B", "C"].forEach((v) => {
+      const given = item.givenAngles.indexOf(v) >= 0;
+      if (given || withAll) al[v] = { text: clean(item.angleVals[v] || triGeom(pts).angles[v]) + "°", color: given ? givenCol : plainCol };
+    });
+    return { sideLabels: sl, angleLabels: al };
+  }
+  if (item.type === "SSA" && phase === "given") {
+    const ni = item.noneInfo, A = item.swing ? [64, 246] : null;
+    const aPt = item.pts ? item.pts.A : ni.A, cPt = item.pts ? item.pts.C : ni.C;
+    const rayEnd = item.pts ? polarFrom(aPt, -item.ssa.angleA, 165) : ni.rayEnd;
+    out += '<line x1="' + fmt(aPt[0]) + '" y1="' + fmt(aPt[1]) + '" x2="' + fmt(cPt[0]) + '" y2="' + fmt(cPt[1]) + '" stroke="#1c2430" stroke-width="2"/>';
+    out += '<line x1="' + fmt(aPt[0]) + '" y1="' + fmt(aPt[1]) + '" x2="' + fmt(rayEnd[0]) + '" y2="' + fmt(rayEnd[1]) + '" stroke="#1c2430" stroke-width="2"/>';
+    out += '<circle cx="' + fmt(cPt[0]) + '" cy="' + fmt(cPt[1]) + '" r="' + fmt(item.ssa.a * PXU) + '" fill="none" stroke="#c2510a" stroke-width="1.8" stroke-dasharray="5 4"/>';
+    const armEnd = polarFrom(cPt, item.swing.armAngle, item.swing.len);
+    out += '<g><animateTransform attributeName="transform" type="rotate" values="-9 ' + fmt(cPt[0]) + " " + fmt(cPt[1]) + "; 9 " + fmt(cPt[0]) + " " + fmt(cPt[1]) + "; -9 " + fmt(cPt[0]) + " " + fmt(cPt[1]) + '" dur="3.2s" repeatCount="indefinite"/>' +
+           '<line x1="' + fmt(cPt[0]) + '" y1="' + fmt(cPt[1]) + '" x2="' + fmt(armEnd[0]) + '" y2="' + fmt(armEnd[1]) + '" stroke="#c2510a" stroke-width="3"/></g>';
+    out += '<path d="' + arcPath(aPt, cPt, rayEnd, 30) + '" fill="none" stroke="#0b5cad" stroke-width="2.2"/>';
+    const alp = polarFrom(aPt, midDir(aPt, cPt, rayEnd), 48);
+    out += '<text x="' + fmt(alp[0]) + '" y="' + fmt(alp[1] + 4) + '" font-size="13.5" font-weight="700" fill="#0b5cad" text-anchor="middle">' + item.ssa.angleA + "°</text>";
+    out += '<text x="' + fmt((aPt[0] + cPt[0]) / 2) + '" y="' + fmt(aPt[1] + 22) + '" font-size="13.5" font-weight="700" fill="#0b5cad" text-anchor="middle">AC = ' + item.ssa.b + "</text>";
+    out += '<text x="' + fmt(cPt[0] + item.ssa.a * PXU * 0.72) + '" y="' + fmt(cPt[1] - item.ssa.a * PXU * 0.72) + '" font-size="13.5" font-weight="700" fill="#c2510a" text-anchor="middle">CB = ' + clean(item.ssa.a) + " (swings)</text>";
+    out += '<circle cx="' + fmt(aPt[0]) + '" cy="' + fmt(aPt[1]) + '" r="2.6" fill="#1c2430"/><circle cx="' + fmt(cPt[0]) + '" cy="' + fmt(cPt[1]) + '" r="2.6" fill="#1c2430"/>';
+    out += '<text x="' + fmt(aPt[0] - 12) + '" y="' + fmt(aPt[1] + 5) + '" font-size="14" font-weight="600" fill="#1c2430">A</text>';
+    out += '<text x="' + fmt(cPt[0] + 12) + '" y="' + fmt(cPt[1] + 5) + '" font-size="14" font-weight="600" fill="#1c2430">C</text>';
+    out += "</svg>";
+    return out;
+  }
+  if (item.noneInfo && phase === "reveal") {
+    const ni = item.noneInfo;
+    out += '<line x1="' + fmt(ni.A[0]) + '" y1="' + fmt(ni.A[1]) + '" x2="' + fmt(ni.C[0]) + '" y2="' + fmt(ni.C[1]) + '" stroke="#1c2430" stroke-width="2"/>';
+    out += '<line x1="' + fmt(ni.A[0]) + '" y1="' + fmt(ni.A[1]) + '" x2="' + fmt(ni.rayEnd[0]) + '" y2="' + fmt(ni.rayEnd[1]) + '" stroke="#1c2430" stroke-width="2"/>';
+    out += '<circle cx="' + fmt(ni.C[0]) + '" cy="' + fmt(ni.C[1]) + '" r="' + fmt(ni.radius) + '" fill="none" stroke="#c2510a" stroke-width="2" stroke-dasharray="5 4"/>';
+    out += '<line x1="' + fmt(ni.C[0]) + '" y1="' + fmt(ni.C[1]) + '" x2="' + fmt(ni.H[0]) + '" y2="' + fmt(ni.H[1]) + '" stroke="#c2510a" stroke-width="2"/>';
+    out += '<text x="' + fmt((ni.C[0] + ni.H[0]) / 2 + 8) + '" y="' + fmt((ni.C[1] + ni.H[1]) / 2) + '" font-size="13" font-weight="700" fill="#c2510a">closest approach: ' + clean(ni.hVal) + "</text>";
+    out += '<text x="' + fmt(ni.C[0]) + '" y="' + fmt(ni.C[1] + ni.radius + 18) + '" font-size="13" font-weight="700" fill="#c2510a" text-anchor="middle">the swinging side reaches only ' + clean(ni.aVal) + "</text>";
+    out += '<circle cx="' + fmt(ni.A[0]) + '" cy="' + fmt(ni.A[1]) + '" r="2.6" fill="#1c2430"/><circle cx="' + fmt(ni.C[0]) + '" cy="' + fmt(ni.C[1]) + '" r="2.6" fill="#1c2430"/>';
+    out += '<text x="' + fmt(ni.A[0] - 12) + '" y="' + fmt(ni.A[1] + 5) + '" font-size="14" font-weight="600" fill="#1c2430">A</text>';
+    out += '<text x="' + fmt(ni.C[0] + 12) + '" y="' + fmt(ni.C[1] + 5) + '" font-size="14" font-weight="600" fill="#1c2430">C</text>';
+    out += "</svg>";
+    return out;
+  }
+  const withAll = phase === "reveal";
+  if (item.altPts && withAll) out += triSVG(item.altPts, Object.assign(labelsFor(item.altPts, false), { dashed: item.type === "SSA" }));
+  if (item.pts) out += triSVG(item.pts, labelsFor(item.pts, withAll));
+  out += "</svg>";
+  return out;
+}
+function ticksSVG(pts, a, b, count) {
+  const p = pts[a], q = pts[b];
+  const mx = (p[0] + q[0]) / 2, my = (p[1] + q[1]) / 2;
+  const d = [q[0] - p[0], q[1] - p[1]], len = Math.hypot(d[0], d[1]) || 1;
+  const u = [d[0] / len, d[1] / len], perp = [-u[1], u[0]];
+  let out = "";
+  for (let j = 0; j < count; j++) {
+    const off = (j - (count - 1) / 2) * 7;
+    const cxp = mx + u[0] * off, cyp = my + u[1] * off;
+    out += '<line x1="' + fmt(cxp - perp[0] * 5.5) + '" y1="' + fmt(cyp - perp[1] * 5.5) + '" x2="' + fmt(cxp + perp[0] * 5.5) + '" y2="' + fmt(cyp + perp[1] * 5.5) + '" stroke="#b3261e" stroke-width="2"/>';
+  }
+  return out;
+}
+function chevronSVG(pts, a, b, count) {
+  const p = pts[a], q = pts[b];
+  const d = [q[0] - p[0], q[1] - p[1]], len = Math.hypot(d[0], d[1]) || 1;
+  const u = [d[0] / len, d[1] / len], perp = [-u[1], u[0]];
+  let out = "";
+  for (let j = 0; j < count; j++) {
+    const t = 0.5 + (j - (count - 1) / 2) * 0.09;
+    const cxp = p[0] + d[0] * t, cyp = p[1] + d[1] * t;
+    const tip = [cxp + u[0] * 6, cyp + u[1] * 6];
+    const b1 = [cxp - u[0] * 2 + perp[0] * 5.5, cyp - u[1] * 2 + perp[1] * 5.5];
+    const b2 = [cxp - u[0] * 2 - perp[0] * 5.5, cyp - u[1] * 2 - perp[1] * 5.5];
+    out += '<path d="M ' + fmt(b1[0]) + " " + fmt(b1[1]) + " L " + fmt(tip[0]) + " " + fmt(tip[1]) + " L " + fmt(b2[0]) + " " + fmt(b2[1]) + '" fill="none" stroke="#0b5cad" stroke-width="2"/>';
+  }
+  return out;
+}
+function vertexLabelsSVG(pts, names) {
+  let cx = 0, cy = 0;
+  names.forEach((n) => { cx += pts[n][0]; cy += pts[n][1]; });
+  cx /= names.length; cy /= names.length;
+  let out = "";
+  names.forEach((n) => {
+    const p = pts[n];
+    let dx = p[0] - cx, dy = p[1] - cy;
+    const len = Math.hypot(dx, dy);
+    if (len < 1) { dx = 10; dy = -10; } else { dx = dx / len * 15; dy = dy / len * 15; }
+    out += '<circle cx="' + fmt(p[0]) + '" cy="' + fmt(p[1]) + '" r="2.6" fill="#1c2430"/>';
+    out += '<text x="' + fmt(p[0] + dx) + '" y="' + fmt(p[1] + dy + 5) + '" font-size="14" font-weight="600" fill="#1c2430" text-anchor="middle">' + n + "</text>";
+  });
+  return out;
+}
+function buildStatementSVG(item) {
+  let out = '<svg viewBox="0 0 700 300" width="700" height="300" role="img" aria-label="Two congruent triangles with marks">';
+  [["A", "B"], ["B", "C"], ["C", "A"]].forEach((pr) => {
+    out += '<line x1="' + fmt(item.pts1[pr[0]][0]) + '" y1="' + fmt(item.pts1[pr[0]][1]) + '" x2="' + fmt(item.pts1[pr[1]][0]) + '" y2="' + fmt(item.pts1[pr[1]][1]) + '" stroke="#1c2430" stroke-width="2"/>';
+    out += ticksSVG(item.pts1, pr[0], pr[1], item.sideTicks[pr.join("")]);
+    const imgPair = [item.imgOf[pr[0]], item.imgOf[pr[1]]];
+    out += '<line x1="' + fmt(item.pts2[imgPair[0]][0]) + '" y1="' + fmt(item.pts2[imgPair[0]][1]) + '" x2="' + fmt(item.pts2[imgPair[1]][0]) + '" y2="' + fmt(item.pts2[imgPair[1]][1]) + '" stroke="#1c2430" stroke-width="2"/>';
+    out += ticksSVG(item.pts2, imgPair[0], imgPair[1], item.sideTicks2[pairKey(imgPair[0], imgPair[1])]);
+  });
+  ["A", "B", "C"].forEach((v) => {
+    const others = ["A", "B", "C"].filter((x) => x !== v);
+    for (let j = 0; j < item.angleArcs[v]; j++) out += '<path d="' + arcPath(item.pts1[v], item.pts1[others[0]], item.pts1[others[1]], 15 + j * 5.5) + '" fill="none" stroke="#0b5cad" stroke-width="1.8"/>';
+    const iv = item.imgOf[v];
+    const iothers = ["A", "B", "C"].map((x) => item.imgOf[x]).filter((x) => x !== iv);
+    for (let j = 0; j < item.angleArcs2[iv]; j++) out += '<path d="' + arcPath(item.pts2[iv], item.pts2[iothers[0]], item.pts2[iothers[1]], 15 + j * 5.5) + '" fill="none" stroke="#0b5cad" stroke-width="1.8"/>';
+  });
+  out += vertexLabelsSVG(item.pts1, ["A", "B", "C"]);
+  out += vertexLabelsSVG(item.pts2, ["P", "Q", "R"]);
+  out += '<text x="180" y="292" font-size="13" fill="#5a6572" text-anchor="middle">Triangle ABC</text>';
+  out += '<text x="492" y="292" font-size="13" fill="#5a6572" text-anchor="middle">Its congruent image</text>';
+  out += "</svg>";
+  return out;
+}
+function buildProofSVG(proof) {
+  const P = proof.points;
+  const names = Object.keys(P);
+  let out = '<svg viewBox="0 0 380 330" width="380" height="330" role="img" aria-label="Proof figure">';
+  proof.segments.forEach((sg) => {
+    out += '<line x1="' + fmt(P[sg[0]][0]) + '" y1="' + fmt(P[sg[0]][1]) + '" x2="' + fmt(P[sg[1]][0]) + '" y2="' + fmt(P[sg[1]][1]) + '" stroke="#1c2430" stroke-width="2"/>';
+  });
+  Object.keys(proof.sideTicks || {}).forEach((k) => {
+    out += ticksSVG(P, k.charAt(0), k.charAt(1), proof.sideTicks[k]);
+  });
+  (proof.parallels || []).forEach((pl) => {
+    out += chevronSVG(P, pl.pair.charAt(0), pl.pair.charAt(1), pl.count);
+  });
+  out += vertexLabelsSVG(P, names);
+  out += "</svg>";
+  return out;
+}
+// ==END GENERATOR==
+</script>
+<script>
+"use strict";
+// UI layer. Generator above is the single source of truth for items and keys.
+const $ = (id) => document.getElementById(id);
+function showFb(el, kind, html) { el.className = "feedback show " + kind; el.innerHTML = html; }
+function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function radioPick(containerId, name, options) {
+  const box = $(containerId);
+  box.innerHTML = "";
+  options.forEach((opt, i) => {
+    const lab = document.createElement("label");
+    lab.className = "pickopt";
+    const inp = document.createElement("input");
+    inp.type = "radio"; inp.name = name; inp.value = opt.value !== undefined ? opt.value : opt; inp.id = name + "_" + i;
+    lab.appendChild(inp);
+    lab.appendChild(document.createTextNode(" " + (opt.label || opt)));
+    box.appendChild(lab);
+  });
+}
+function pickedRadio(name) {
+  const el = document.querySelector('input[name="' + name + '"]:checked');
+  return el ? el.value : null;
+}
+function shuffleUi(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = a[i]; a[i] = a[j]; a[j] = t; }
+  return a;
+}
+
+// ---------- Mode tabs ----------
+
+function setMode(which) {
+  const panels = { ctor: "panelCtor", stmt: "panelStmt", proof: "panelProof", flaw: "panelFlaw" };
+  Object.keys(panels).forEach((k) => {
+    $(panels[k]).classList.toggle("hidden", k !== which);
+    const btn = $("mode" + k.charAt(0).toUpperCase() + k.slice(1));
+    btn.setAttribute("aria-pressed", k === which ? "true" : "false");
+    btn.classList.toggle("secondary", k !== which);
+  });
+}
+$("modeCtor").addEventListener("click", () => setMode("ctor"));
+$("modeStmt").addEventListener("click", () => setMode("stmt"));
+$("modeProof").addEventListener("click", () => setMode("proof"));
+$("modeFlaw").addEventListener("click", () => setMode("flaw"));
+
+// ---------- Constructor ----------
+
+let ctorType = "SSS", ctorItemCur = null, ctorRevealed = false;
+const ctorLog = [], ctorFirstVerdict = {};
+
+const typeBox = $("ctorTypes");
+CTOR_TYPES.concat(["Surprise me"]).forEach((t) => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.textContent = t;
+  b.id = "ctorType_" + t.replace(/\s/g, "");
+  b.setAttribute("aria-pressed", t === "SSS" ? "true" : "false");
+  if (t !== "SSS") b.className = "secondary";
+  b.addEventListener("click", () => {
+    if (t === "Surprise me") { ctorType = CTOR_TYPES[Math.floor(Math.random() * CTOR_TYPES.length)]; }
+    else ctorType = t;
+    CTOR_TYPES.concat(["Surprise me"]).forEach((x) => {
+      const bb = $("ctorType_" + x.replace(/\s/g, ""));
+      const on = x === ctorType || (x === "Surprise me" && false);
+      bb.setAttribute("aria-pressed", on ? "true" : "false");
+      bb.classList.toggle("secondary", !on);
+    });
+    newCtorCase();
+  });
+  typeBox.appendChild(b);
+});
+
+function newCtorCase() {
+  ctorItemCur = genConstructor(ctorType);
+  ctorRevealed = false;
+  $("ctorGivens").textContent = "Part-set " + ctorItemCur.type + ". " + ctorItemCur.givenText;
+  $("ctorDiagram").innerHTML = buildConstructorSVG(ctorItemCur, "given");
+  radioPick("ctorPicks", "ctorVerdict", VERDICTS);
+  $("ctorReveal").disabled = false;
+  showFb($("ctorFeedback"), "info", "<p>Study the givens, then record your verdict. The construction stays hidden until you commit.</p>");
+}
+$("ctorNew").addEventListener("click", newCtorCase);
+
+$("ctorReveal").addEventListener("click", () => {
+  if (ctorRevealed) return;
+  const v = pickedRadio("ctorVerdict");
+  const fb = $("ctorFeedback");
+  if (!v) { showFb(fb, "bad", "<p class=\"sumline\">Record a verdict first.</p><p>An unrecorded guess is not data; the pattern in the summary only means something if every verdict was committed before its reveal.</p>"); return; }
+  ctorRevealed = true;
+  $("ctorReveal").disabled = true;
+  const correct = v === ctorItemCur.verdictKey;
+  ctorLog.push({ item: ctorItemCur, verdict: v, correct: correct });
+  if (!(ctorItemCur.type in ctorFirstVerdict)) ctorFirstVerdict[ctorItemCur.type] = v;
+  $("ctorDiagram").innerHTML = buildConstructorSVG(ctorItemCur, "reveal");
+  renderRecord();
+  renderCtorSummary();
+  showFb(fb, correct ? "ok" : "info",
+    "<p class=\"sumline\">" + (correct ? "Your verdict matches the construction: " : "Your verdict was \"" + esc(v) + "\", but the construction gives: ") + esc(ctorItemCur.verdictKey) + ".</p><p>" + esc(ctorItemCur.explanation) + "</p>");
+});
+
+function renderCtorSummary() {
+  const attempted = Object.keys(ctorFirstVerdict);
+  if (attempted.length < CTOR_TYPES.length) return;
+  let h = "<table class=\"plan\"><tr><th>Part-set</th><th>Your first verdict</th><th>The construction says</th></tr>";
+  CTOR_TYPES.forEach((t) => {
+    const first = ctorLog.filter((e) => e.item.type === t)[0];
+    h += "<tr><td>" + t + "</td><td>" + esc(ctorFirstVerdict[t]) + "</td><td>" + esc(first.item.verdictKey) + "</td></tr>";
+  });
+  h += "</table>";
+  h += "<p>The pattern your own verdicts just built: SSS, SAS, ASA and AAS each force exactly one triangle, and those four are the congruence shortcuts. SSA does not appear in that list: its swinging side can land twice, once, or not at all, depending on its length. AAA does not appear either: it fixes the shape and leaves the size free, which is similarity, not congruence.</p>";
+  $("ctorSummaryBody").innerHTML = h;
+  $("ctorSummary").classList.remove("hidden");
+}
+
+// ---------- Congruence statements ----------
+
+let stmtItem = null;
+const stmtLog = [];
+
+function newStmt() {
+  stmtItem = genStatement();
+  $("stmtDiagram").innerHTML = buildStatementSVG(stmtItem);
+  const box = $("stmtSelects");
+  box.innerHTML = "";
+  ["A", "B", "C"].forEach((v) => {
+    const wrap = document.createElement("div");
+    wrap.className = "field";
+    wrap.style.maxWidth = "300px";
+    const lab = document.createElement("label");
+    lab.htmlFor = "stmt_" + v;
+    lab.textContent = "Vertex " + v + " of triangle ABC corresponds to:";
+    const sel = document.createElement("select");
+    sel.id = "stmt_" + v;
+    ["", "P", "Q", "R"].forEach((o) => {
+      const opt = document.createElement("option");
+      opt.value = o; opt.textContent = o === "" ? "Choose..." : o;
+      sel.appendChild(opt);
+    });
+    wrap.appendChild(lab); wrap.appendChild(sel);
+    box.appendChild(wrap);
+  });
+  showFb($("stmtFeedback"), "info", "<p>Read the marks, not the positions: equal tick counts mean equal sides, equal arc counts mean equal angles. The image may be rotated or flipped.</p>");
+}
+$("stmtNew").addEventListener("click", newStmt);
+
+$("stmtCheck").addEventListener("click", () => {
+  const fb = $("stmtFeedback");
+  const chosen = {};
+  let missing = false;
+  ["A", "B", "C"].forEach((v) => { chosen[v] = $("stmt_" + v).value; if (!chosen[v]) missing = true; });
+  if (missing) { showFb(fb, "bad", "<p class=\"sumline\">Choose an image for all three vertices first.</p>"); return; }
+  const wrong = ["A", "B", "C"].filter((v) => chosen[v] !== stmtItem.imgOf[v]);
+  if (!wrong.length) {
+    const statement = "Triangle ABC is congruent to triangle " + stmtItem.imgOf.A + stmtItem.imgOf.B + stmtItem.imgOf.C;
+    stmtLog.push({ statement: statement });
+    renderRecord();
+    showFb(fb, "ok", "<p class=\"sumline\">" + esc(statement) + ".</p><p>Vertex order is the meaning: A matches " + stmtItem.imgOf.A + ", B matches " + stmtItem.imgOf.B + ", C matches " + stmtItem.imgOf.C + ", which is exactly what the marks say. Any proof that cites this congruence will read corresponding parts off this order.</p>");
+    return;
+  }
+  const v = wrong[0];
+  const sidesText = { 1: "one tick", 2: "two ticks", 3: "three ticks" };
+  showFb(fb, "bad", "<p class=\"sumline\">Vertex " + v + " does not match " + chosen[v] + ".</p><p>At vertex " + v + ", the two sides carry " +
+    esc(sidesText[stmtItem.sideTicks[v === "A" ? "CA" : v === "B" ? "AB" : "BC"]]) + " and " + esc(sidesText[stmtItem.sideTicks[v === "A" ? "AB" : v === "B" ? "BC" : "CA"]]) +
+    ", and the angle carries " + stmtItem.angleArcs[v] + (stmtItem.angleArcs[v] === 1 ? " arc" : " arcs") +
+    ". Find the image vertex with the same marks around it.</p>");
+});
+
+// ---------- Proof Builder ----------
+
+let proof = null, proofRows = [], proofLogged = false;
+const proofLog = [];
+
+function newProof() {
+  proof = genProof();
+  proofRows = [];
+  proofLogged = false;
+  $("proofGivens").innerHTML = "<p><strong>Given:</strong> " + proof.givenLines.map(esc).join(" ") + "</p><p><strong>" + esc(proof.goalText) + "</strong></p>";
+  $("proofDiagram").innerHTML = buildProofSVG(proof);
+  renderTiles();
+  renderProofRows();
+  showFb($("proofFeedback"), "info", "<p>" + esc(proof.title) + ". Build the proof row by row.</p>");
+}
+function proofStatementById(id) {
+  return proof.statements.concat(proof.distractors).filter((s) => s.id === id)[0];
+}
+function renderTiles() {
+  const box = $("proofTiles");
+  box.innerHTML = "";
+  shuffleUi(proof.statements.concat(proof.distractors)).forEach((s) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "tile" + (proofRows.indexOf(s.id) >= 0 ? " used" : "");
+    b.textContent = s.text;
+    b.disabled = proofRows.indexOf(s.id) >= 0;
+    b.addEventListener("click", () => { proofRows.push(s.id); renderTiles(); renderProofRows(); });
+    box.appendChild(b);
+  });
+}
+function renderProofRows() {
+  const box = $("proofRows");
+  if (!proofRows.length) { box.innerHTML = "<p class=\"note\">No rows yet. Click a tile to start.</p>"; return; }
+  box.innerHTML = "";
+  proofRows.forEach((id, i) => {
+    const s = proofStatementById(id);
+    const row = document.createElement("div");
+    row.className = "proofrow";
+    const stmt = document.createElement("div");
+    stmt.className = "stmt";
+    stmt.textContent = (i + 1) + ". " + s.text;
+    const sel = document.createElement("select");
+    sel.id = "proofReason_" + id;
+    sel.setAttribute("aria-label", "Reason for row " + (i + 1));
+    const ph = document.createElement("option");
+    ph.value = ""; ph.textContent = "Choose a reason...";
+    sel.appendChild(ph);
+    proof.reasonBank.forEach((rb) => {
+      const o = document.createElement("option");
+      o.value = rb; o.textContent = rb;
+      sel.appendChild(o);
+    });
+    const prev = proofReasonsCache[id];
+    if (prev) sel.value = prev;
+    sel.addEventListener("change", () => { proofReasonsCache[id] = sel.value; });
+    row.appendChild(stmt); row.appendChild(sel);
+    box.appendChild(row);
+  });
+}
+let proofReasonsCache = {};
+$("proofUndo").addEventListener("click", () => { proofRows.pop(); renderTiles(); renderProofRows(); });
+$("proofClear").addEventListener("click", () => { proofRows = []; proofReasonsCache = {}; renderTiles(); renderProofRows(); });
+$("proofNew").addEventListener("click", () => { proofReasonsCache = {}; newProof(); });
+
+$("proofCheck").addEventListener("click", () => {
+  const fb = $("proofFeedback");
+  if (!proofRows.length) { showFb(fb, "bad", "<p class=\"sumline\">The proof is empty.</p><p>Start with the givens, in any order.</p>"); return; }
+  const reasonsById = {};
+  proofRows.forEach((id) => { reasonsById[id] = ($("proofReason_" + id) || {}).value || ""; });
+  const result = checkProofAssembly(proof, proofRows, reasonsById);
+  if (result.ok) {
+    if (!proofLogged) {
+      proofLogged = true;
+      proofLog.push({ proof: proof, rows: proofRows.map((id) => ({ text: proofStatementById(id).text, reason: reasonsById[id] })) });
+      renderRecord();
+    }
+    showFb(fb, "ok", "<p class=\"sumline\">That is a complete, correctly ordered proof.</p><p>Every statement is earned, every reason is the right one, and the corresponding-parts claim comes after the congruence it rests on. It is on your Proof Record below.</p>");
+  } else {
+    showFb(fb, "bad", "<p class=\"sumline\">Not yet. Work through these:</p>" + result.problems.slice(0, 3).map((p) => "<p>" + esc(p) + "</p>").join(""));
+  }
+});
+
+// ---------- Flawed proofs ----------
+
+let flawed = null;
+const flawLog = [];
+
+function newFlaw() {
+  flawed = genFlawed();
+  const p = flawed.proof;
+  $("flawGivens").innerHTML = "<p><strong>Given:</strong> " + p.givenLines.map(esc).join(" ") + "</p><p><strong>" + esc(p.goalText) + "</strong></p>";
+  $("flawDiagram").innerHTML = buildProofSVG(p);
+  radioPick("flawSteps", "flawStep", flawed.displayed.map((row, i) => ({
+    value: String(i), label: "Step " + (i + 1) + ": " + row.statement + " (" + row.reason + ")"
+  })));
+  radioPick("flawFixes", "flawFix", flawed.fixOptions.map((f) => ({ value: f.id, label: f.text })));
+  showFb($("flawFeedback"), "info", "<p>" + esc(p.title) + ". Exactly one step is flawed. Check each step against the figure and the givens before you accuse one.</p>");
+}
+$("flawNew").addEventListener("click", newFlaw);
+
+$("flawCheck").addEventListener("click", () => {
+  const fb = $("flawFeedback");
+  const stepSel = pickedRadio("flawStep"), fixSel = pickedRadio("flawFix");
+  if (stepSel === null) { showFb(fb, "bad", "<p class=\"sumline\">Name the flawed step first.</p>"); return; }
+  const idx = parseInt(stepSel, 10);
+  if (idx !== flawed.flawIndex) {
+    showFb(fb, "bad", "<p class=\"sumline\">Step " + (idx + 1) + " is sound.</p><p>Its statement follows from the givens and the steps before it, and its reason is the right one. The flaw is " + (idx < flawed.flawIndex ? "later" : "earlier") + ": check what each step rests on.</p>");
+    return;
+  }
+  if (!fixSel) { showFb(fb, "bad", "<p class=\"sumline\">You found the flawed step. Now choose the correction.</p>"); return; }
+  if (fixSel !== flawed.correctFixId) {
+    showFb(fb, "bad", "<p class=\"sumline\">Right step, wrong correction.</p><p>Look at the step again: what exactly is broken in it, the statement, the reason, or its position?</p>");
+    return;
+  }
+  flawLog.push({ flawed: flawed });
+  renderRecord();
+  showFb(fb, "ok", "<p class=\"sumline\">Flaw found and corrected.</p><p>" + esc(flawed.fixOptions.filter((f) => f.id === "fix")[0].text) + "</p>");
+});
+
+// ---------- Record ----------
+
+function renderRecord() {
+  if (!ctorLog.length && !stmtLog.length && !proofLog.length && !flawLog.length) return;
+  let h = "";
+  if (ctorLog.length) {
+    h += "<h3>Constructor verdicts (recorded before each reveal)</h3><table><tr><th>Part-set</th><th>Givens</th><th>My verdict</th><th>Construction</th></tr>";
+    ctorLog.forEach((e) => {
+      h += "<tr><td>" + e.item.type + "</td><td>" + esc(e.item.givenText) + "</td><td>" + esc(e.verdict) + (e.correct ? "" : " (revised by the reveal)") + "</td><td>" + esc(e.item.verdictKey) + "</td></tr>";
+    });
+    h += "</table>";
+  }
+  stmtLog.forEach((e, i) => { h += "<h3>Correspondence statement " + (i + 1) + "</h3><p>" + esc(e.statement) + ".</p>"; });
+  proofLog.forEach((e, i) => {
+    h += "<h3>Proof " + (i + 1) + ": " + esc(e.proof.title) + "</h3>";
+    h += "<p>Given: " + esc(e.proof.givenLines.join(" ")) + " " + esc(e.proof.goalText) + "</p>";
+    h += "<table><tr><th>Statement</th><th>Reason</th></tr>";
+    e.rows.forEach((row) => { h += "<tr><td>" + esc(row.text) + "</td><td>" + esc(row.reason) + "</td></tr>"; });
+    h += "</table>";
+  });
+  flawLog.forEach((e, i) => {
+    const f = e.flawed;
+    h += "<h3>Flawed proof repaired " + (i + 1) + ": " + esc(f.proof.title) + "</h3><p>Flawed step: Step " + (f.flawIndex + 1) + ". Correction: " + esc(f.fixOptions.filter((x) => x.id === "fix")[0].text) + "</p>";
+  });
+  $("dsBody").innerHTML = h;
+}
+$("printBtn").addEventListener("click", () => window.print());
+
+newCtorCase();
+newStmt();
+newProof();
+newFlaw();
+</script>
+</body>
+</html>
